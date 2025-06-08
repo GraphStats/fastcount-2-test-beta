@@ -787,13 +787,13 @@
                 
                 channelCard.addEventListener('click', () => {
                     channelId = channel[2];
-                    const newUrl = `${window.location.pathname}#${channelId}`;
+                    // Change l'URL en /youtube/:id
+                    const newUrl = `/youtube/${channelId}`;
                     window.history.pushState({}, '', newUrl);
-                    
+
                     showCounter();
                     clearInterval(intervalId);
-                    
-                    
+
                     fetchStatsData();
                     intervalId = setInterval(fetchStatsData, 2000);
                 });
@@ -934,46 +934,60 @@
             }
         });
         
-        // Nouvelle logique de navigation
-        function showHome() {
-            document.getElementById('home-block').classList.remove('hidden');
-            document.getElementById('main-header').classList.add('hidden');
-            document.getElementById('main-container').classList.add('hidden');
-            document.getElementById('main-footer').classList.add('hidden');
-        }
-        function showYoutube() {
-            document.getElementById('home-block').classList.add('hidden');
-            document.getElementById('main-header').classList.remove('hidden');
-            document.getElementById('main-container').classList.remove('hidden');
-            document.getElementById('main-footer').classList.remove('hidden');
+        // Helper pour extraire l'id de chaîne depuis l'URL (youtube/:id)
+        function getChannelIdFromPath() {
+            const path = window.location.pathname.replace(/\/+$/, '');
+            const match = path.match(/\/youtube\/([^\/]+)/);
+            return match ? match[1] : null;
         }
 
-        // Gère la navigation selon l'URL
+        // Nouvelle version de handleRoute pour support /youtube/:id
         function handleRoute() {
             let path = window.location.pathname;
-            // Si on est sur une page 404 ou index.html (hébergement statique), mais qu'il y a un hash avec un id de chaîne
+            // Cas 404 ou index.html avec /youtube/:id dans le hash (ancienne version, migration)
             if (
                 (path.endsWith('/404') || path.endsWith('/index.html')) &&
-                window.location.hash &&
-                window.location.hash.length > 1
+                window.location.hash.startsWith('#/youtube/')
             ) {
-                // Redirige vers /youtube#id
-                window.location.replace('/youtube' + window.location.hash);
+                // Redirige vers la nouvelle URL propre
+                window.location.replace(window.location.hash.slice(1));
                 return;
             }
 
-            // Si on est sur /youtube ou /youtube/ (avec ou sans hash)
-            if (path.replace(/\/+$/, '').endsWith('/youtube')) {
+            // Si on est sur /youtube ou /youtube/
+            if (path.replace(/\/+$/, '') === '/youtube') {
                 showYoutube();
                 init();
-            } else if (
+            }
+            // Si on est sur /youtube/:id
+            else if (/^\/youtube\/[^\/]+$/.test(path)) {
+                showYoutube();
+                // On récupère l'id de la chaîne depuis l'URL
+                const channelIdFromUrl = getChannelIdFromPath();
+                if (channelIdFromUrl) {
+                    channelId = channelIdFromUrl;
+                    showCounter();
+                    fetchStatsData();
+                    clearInterval(intervalId);
+                    intervalId = setInterval(fetchStatsData, 2000);
+                }
+                checkMinimalMode();
+            }
+            // Si on est sur la racine avec un hash de l'ancienne forme, migration auto
+            else if (
                 (path === '' || path === '/') &&
-                window.location.hash &&
+                window.location.hash.startsWith('#/youtube/')
+            ) {
+                window.location.replace(window.location.hash.slice(1));
+            }
+            // Si on est sur la racine avec un hash #id, migration auto
+            else if (
+                (path === '' || path === '/') &&
                 window.location.hash.length > 1
             ) {
-                // Si on est sur la racine avec un hash, redirige vers /youtube#id
-                window.location.replace('/youtube' + window.location.hash);
-            } else {
+                window.location.replace('/youtube/' + window.location.hash.substring(1));
+            }
+            else {
                 showHome();
             }
         }
