@@ -936,20 +936,23 @@
         
         // Helper pour extraire l'id de chaîne depuis l'URL (youtube/:id)
         function getChannelIdFromPath() {
+            // Supporte aussi les chemins avec /index.html ou /404 (hébergement statique)
             const path = window.location.pathname.replace(/\/+$/, '');
+            // Cherche /youtube/:id n'importe où dans le path
             const match = path.match(/\/youtube\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
-        // Nouvelle version de handleRoute pour support /youtube/:id
+        // Nouvelle version de handleRoute pour supporter les hébergements statiques (Vercel, Netlify, etc.)
         function handleRoute() {
             let path = window.location.pathname;
-            // Cas 404 ou index.html avec /youtube/:id dans le hash (ancienne version, migration)
+
+            // Si on est sur une page 404 ou index.html (hébergement statique), mais qu'il y a /youtube/:id dans le path
             if (
                 (path.endsWith('/404') || path.endsWith('/index.html')) &&
-                window.location.hash.startsWith('#/youtube/')
+                /\/youtube\/[^\/]+/.test(window.location.hash)
             ) {
-                // Redirige vers la nouvelle URL propre
+                // Redirige vers la nouvelle URL propre (hash sans #)
                 window.location.replace(window.location.hash.slice(1));
                 return;
             }
@@ -959,8 +962,8 @@
                 showYoutube();
                 init();
             }
-            // Si on est sur /youtube/:id
-            else if (/^\/youtube\/[^\/]+$/.test(path)) {
+            // Si on est sur /youtube/:id ou /index.html/youtube/:id ou /404/youtube/:id
+            else if (/\/youtube\/[^\/]+$/.test(path)) {
                 showYoutube();
                 // On récupère l'id de la chaîne depuis l'URL
                 const channelIdFromUrl = getChannelIdFromPath();
