@@ -1202,7 +1202,7 @@
                     twitterId = account[2];
                     const newUrl = `/twitter/${twitterId}`;
                     window.history.pushState({}, '', newUrl);
-                    showTwitterCounter();
+                    window.showTwitterCounter();
                     clearInterval(twitterIntervalId);
                     fetchTwitterStats();
                     twitterIntervalId = setInterval(fetchTwitterStats, 2000);
@@ -1211,13 +1211,12 @@
             });
         }
 
-        // Minimal mode Twitter
-        window.checkTwitterMinimalMode = function() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('minimal') === 'true') {
-                document.body.classList.add('minimal-mode');
-                document.getElementById("twitter-counter-container").style.display = "block";
-            }
+        // Ajout de la fonction globale showTwitterCounter
+        window.showTwitterCounter = function() {
+            document.getElementById("twitter-counter-container").style.display = "block";
+            document.getElementById("twitter-results-container").style.display = "none";
+            document.querySelector("#twitter-container .search-card").style.display = "none";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     </script>
 </body>
