@@ -1143,6 +1143,54 @@
             // Appelle la logique de route au chargement
             handleRoute();
         });
+
+        // --- Fonctions Twitter manquantes à rendre globales ---
+
+        // Gestion touche entrée pour Twitter
+        window.handleTwitterKeyPress = function(event) {
+            if (event.key === "Enter") {
+                window.fetchTwitterData();
+            }
+        };
+
+        // Recherche Twitter
+        window.fetchTwitterData = async function() {
+            const username = document.getElementById("twitter-input").value.trim();
+            if (!username) {
+                showAlert("Veuillez entrer un nom de compte Twitter");
+                return;
+            }
+            const loader = document.getElementById("twitter-loader");
+            const resultsContainer = document.getElementById("twitter-results-container");
+            const resultsGrid = document.getElementById("twitter-results-grid");
+            loader.style.display = "block";
+            resultsContainer.style.display = "none";
+            resultsGrid.innerHTML = "";
+            try {
+                const response = await fetch(`https://mixerno.space/api/twitter-user-counter/search/${encodeURIComponent(username)}`);
+                const data = await response.json();
+                loader.style.display = "none";
+                if (!data.list || data.list.length === 0) {
+                    showAlert("Aucun compte trouvé. Essayez un autre nom.");
+                    return;
+                }
+                displayTwitterResults(data.list);
+                resultsContainer.style.display = "block";
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                loader.style.display = "none";
+                showAlert("Erreur lors de la recherche Twitter.");
+            }
+        };
+
+        // Minimal mode Twitter
+        window.checkTwitterMinimalMode = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('minimal') === 'true') {
+                document.body.classList.add('minimal-mode');
+                document.getElementById("twitter-counter-container").style.display = "block";
+            }
+        };
     </script>
 </body>
 </html>
