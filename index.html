@@ -585,9 +585,15 @@
     
     <!-- Home block -->
     <div class="home-block" id="home-block">
-        <div class="home-card">
-            <div class="home-title">YouTube</div>
-            <span class="home-link" id="goto-youtube">YouTube Live Subscriber Counter</span>
+        <div style="display: flex; gap: 2.5rem; align-items: flex-start;">
+            <div class="home-card">
+                <div class="home-title">YouTube</div>
+                <span class="home-link" id="goto-youtube">YouTube Live Subscriber Counter</span>
+            </div>
+            <div class="home-card">
+                <div class="home-title" style="color: #1da1f2;">X</div>
+                <span class="home-link" id="goto-twitter" style="background: linear-gradient(90deg,#1da1f2,#6366f1);">Twitter Live Follower Counter</span>
+            </div>
         </div>
     </div>
     
@@ -667,6 +673,68 @@
         </div>
     </div>
     
+    <!-- Twitter container -->
+    <div class="container hidden" id="twitter-container">
+        <!-- Search card -->
+        <div class="search-card">
+            <h1 class="search-title" style="background: linear-gradient(90deg,#1da1f2,#6366f1);">Twitter Follower Tracker</h1>
+            <p class="search-description">
+                Suivez en temps réel le nombre d'abonnés de n'importe quel compte Twitter/X avec de belles statistiques.
+            </p>
+            <div class="search-form">
+                <input type="text" 
+                       class="search-input" 
+                       id="twitter-input" 
+                       placeholder="Entrez le nom du compte Twitter"
+                       onkeypress="handleTwitterKeyPress(event)">
+                <button class="search-button" style="background: linear-gradient(135deg,#1da1f2,#6366f1);" onclick="fetchTwitterData()">
+                    <i class="fab fa-x-twitter"></i>
+                    Rechercher
+                </button>
+            </div>
+            <div class="loader" id="twitter-loader">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+        </div>
+        <!-- Results container -->
+        <div class="results-container" id="twitter-results-container">
+            <h2 class="results-title">Résultats de la recherche</h2>
+            <div class="results-grid" id="twitter-results-grid"></div>
+        </div>
+        <!-- Counter container -->
+        <div class="counter-container" id="twitter-counter-container">
+            <div class="channel-header">
+                <img src="" alt="Avatar Twitter" class="channel-avatar-lg" id="twitter-avatar">
+                <h2 class="channel-name-lg" id="twitter-name"></h2>
+                <p class="subscriber-label">Followers</p>
+                <div class="odometer" id="twitter-follower-count">0</div>
+            </div>
+            <div class="counter-actions">
+                <div class="share-dropdown">
+                    <button class="action-button share-button" style="background: linear-gradient(135deg,#1da1f2,#6366f1);" onclick="toggleTwitterShareOptions()">
+                        <i class="fas fa-share-alt"></i>
+                        Partager
+                    </button>
+                    <div class="share-options" id="twitter-share-options">
+                        <div class="share-option" onclick="shareTwitterOnTwitter()">
+                            <i class="fab fa-twitter"></i>
+                            Twitter
+                        </div>
+                        <div class="share-option" onclick="copyTwitterLink()">
+                            <i class="fas fa-link"></i>
+                            Copier le lien
+                        </div>
+                    </div>
+                </div>
+                <button class="action-button minimal-button" onclick="activateTwitterMinimalMode()">
+                    <i class="fas fa-minimize"></i>
+                    Minimal Mode
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Footer -->
     <footer class="footer hidden" id="main-footer">
         FastCount v2.0 • Real-time YouTube Analytics • © 2025
@@ -678,7 +746,9 @@
     <script>
         // Global variables
         let channelId, intervalId, odometer;
-        
+        // Variables Twitter
+        let twitterId, twitterIntervalId, twitterOdometer;
+
         // Initialize particles
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -936,7 +1006,7 @@
             }
         });
         
-        // Helper pour extraire l'id de chaîne depuis l'URL (youtube/:id)
+        // Helper pour extraire l'ID de chaîne depuis l'URL (youtube/:id)
         function getChannelIdFromPath() {
             const path = window.location.pathname.replace(/\/+$/, '');
             const match = path.match(/\/youtube\/([^\/]+)/);
@@ -980,8 +1050,53 @@
             ) {
                 window.location.replace('/youtube/' + window.location.hash.substring(1));
             }
+            // Twitter
+            else if (path.replace(/\/+$/, '') === '/twitter') {
+                showTwitter();
+                // Init Twitter
+                document.getElementById("twitter-container").classList.remove('hidden');
+                document.getElementById("main-container").classList.add('hidden');
+                document.getElementById("main-header").classList.remove('hidden');
+                document.getElementById("main-footer").classList.remove('hidden');
+                document.getElementById("twitter-counter-container").style.display = "none";
+                document.getElementById("twitter-results-container").style.display = "none";
+                document.querySelector("#twitter-container .search-card").style.display = "block";
+                checkTwitterMinimalMode();
+            }
+            else if (/\/twitter\/[^\/]+$/.test(path)) {
+                showTwitter();
+                document.getElementById("twitter-container").classList.remove('hidden');
+                document.getElementById("main-container").classList.add('hidden');
+                document.getElementById("main-header").classList.remove('hidden');
+                document.getElementById("main-footer").classList.remove('hidden');
+                // On récupère l'id du compte Twitter depuis l'URL
+                const twitterIdFromUrl = getTwitterIdFromPath();
+                if (twitterIdFromUrl) {
+                    twitterId = twitterIdFromUrl;
+                    showTwitterCounter();
+                    fetchTwitterStats();
+                    clearInterval(twitterIntervalId);
+                    twitterIntervalId = setInterval(fetchTwitterStats, 2000);
+                }
+                checkTwitterMinimalMode();
+            }
+            // Si on est sur la racine avec un hash de l'ancienne forme, migration auto
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.startsWith('#/twitter/')
+            ) {
+                window.location.replace(window.location.hash.slice(1));
+            }
+            // Si on est sur la racine avec un hash #id, migration auto
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.length > 1
+            ) {
+                window.location.replace('/twitter/' + window.location.hash.substring(1));
+            }
             else {
                 showHome();
+                document.getElementById("twitter-container").classList.add('hidden');
             }
         }
 
@@ -997,6 +1112,12 @@
             document.getElementById('main-container').classList.remove('hidden');
             document.getElementById('main-footer').classList.remove('hidden');
         }
+        function showTwitter() {
+            document.getElementById('home-block').classList.add('hidden');
+            document.getElementById('twitter-container').classList.remove('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('main-footer').classList.remove('hidden');
+        }
 
         // Clique sur le lien d'accueil
         document.addEventListener('DOMContentLoaded', function() {
@@ -1005,6 +1126,14 @@
             if (goto) {
                 goto.addEventListener('click', function() {
                     window.history.pushState({}, '', '/youtube');
+                    handleRoute();
+                });
+            }
+            // Ajoute le listener sur le lien Twitter
+            const gotoTwitter = document.getElementById('goto-twitter');
+            if (gotoTwitter) {
+                gotoTwitter.addEventListener('click', function() {
+                    window.history.pushState({}, '', '/twitter');
                     handleRoute();
                 });
             }
