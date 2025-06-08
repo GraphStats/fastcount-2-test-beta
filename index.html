@@ -1984,6 +1984,11 @@
         function showYTVideoCounter(video) {
             // video = [title, videoId, channelTitle, thumbnail]
             ytvideoId = video[1];
+            // Correction : ne pas continuer si l'ID vidéo ressemble à une URL (erreur d'API)
+            if (!ytvideoId || ytvideoId.startsWith('http')) {
+                showAlert("Invalid video ID. Please try another video.");
+                return;
+            }
             document.getElementById("ytvideo-thumbnail").src = video[3] || 'https://via.placeholder.com/120';
             document.getElementById("ytvideo-title").textContent = video[0];
             document.getElementById("ytvideo-counter-container").style.display = "block";
@@ -1996,7 +2001,7 @@
         }
 
         function fetchYTVideoStats() {
-            if (!ytvideoId) return;
+            if (!ytvideoId || ytvideoId.startsWith('http')) return;
             fetch(`https://mixerno.space/api/youtube-video-counter/video/${ytvideoId}`)
                 .then(res => res.json())
                 .then(data => {
