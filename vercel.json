@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/youtube/:id", "destination": "/" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
