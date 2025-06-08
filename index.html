@@ -803,8 +803,10 @@
         }
         
         async function fetchStatsData() {
+            // Utilise toujours l'id extrait de l'URL si possible
+            const id = getChannelIdFromPath() || channelId;
             try {
-                const response = await fetch(`https://backend.mixerno.space/api/youtube/estv3/${channelId}`);
+                const response = await fetch(`https://backend.mixerno.space/api/youtube/estv3/${id}`);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -936,26 +938,14 @@
         
         // Helper pour extraire l'id de chaîne depuis l'URL (youtube/:id)
         function getChannelIdFromPath() {
-            // Supporte aussi les chemins avec /index.html ou /404 (hébergement statique)
             const path = window.location.pathname.replace(/\/+$/, '');
-            // Cherche /youtube/:id n'importe où dans le path
             const match = path.match(/\/youtube\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
-        // Nouvelle version de handleRoute pour supporter les hébergements statiques (Vercel, Netlify, etc.)
+        // Nouvelle version de handleRoute pour supporter /youtube/:id
         function handleRoute() {
             let path = window.location.pathname;
-
-            // Si on est sur une page 404 ou index.html (hébergement statique), mais qu'il y a /youtube/:id dans le path
-            if (
-                (path.endsWith('/404') || path.endsWith('/index.html')) &&
-                /\/youtube\/[^\/]+/.test(window.location.hash)
-            ) {
-                // Redirige vers la nouvelle URL propre (hash sans #)
-                window.location.replace(window.location.hash.slice(1));
-                return;
-            }
 
             // Si on est sur /youtube ou /youtube/
             if (path.replace(/\/+$/, '') === '/youtube') {
