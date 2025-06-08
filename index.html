@@ -968,6 +968,15 @@
             }
         }
         
+        // Minimal mode Twitter (doit être défini avant handleRoute)
+        function checkTwitterMinimalMode() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('minimal') === 'true') {
+                document.body.classList.add('minimal-mode');
+                document.getElementById("twitter-counter-container").style.display = "block";
+            }
+        }
+        
         // Show alert message
         function showAlert(message) {
             const alert = document.createElement('div');
@@ -1010,6 +1019,13 @@
         function getChannelIdFromPath() {
             const path = window.location.pathname.replace(/\/+$/, '');
             const match = path.match(/\/youtube\/([^\/]+)/);
+            return match ? match[1] : null;
+        }
+
+        // Helper pour extraire l'id Twitter depuis l'URL
+        function getTwitterIdFromPath() {
+            const path = window.location.pathname.replace(/\/+$/, '');
+            const match = path.match(/\/twitter\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
