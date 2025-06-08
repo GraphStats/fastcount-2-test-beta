@@ -1984,8 +1984,9 @@
         function showYTVideoCounter(video) {
             // video = [title, videoId, channelTitle, thumbnail]
             ytvideoId = video[1];
-            // Correction : ne pas continuer si l'ID vidéo ressemble à une URL (erreur d'API)
-            if (!ytvideoId || ytvideoId.startsWith('http')) {
+            // Correction : vérifier si l'ID vidéo est bien un ID YouTube valide (11 caractères, alphanumérique, - ou _)
+            const ytIdRegex = /^[a-zA-Z0-9_-]{11}$/;
+            if (!ytvideoId || !ytIdRegex.test(ytvideoId)) {
                 showAlert("Invalid video ID. Please try another video.");
                 return;
             }
