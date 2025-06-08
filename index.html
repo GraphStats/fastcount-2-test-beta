@@ -599,7 +599,7 @@
     
     <!-- Header -->
     <header class="header hidden" id="main-header">
-        <a href="#" class="logo">
+        <a href="#" class="logo" id="logo-link">
             <i class="fas fa-chart-line logo-icon"></i>
             <span>FastCount</span>
         </a>
@@ -1074,6 +1074,15 @@
             if (gotoTwitter) {
                 gotoTwitter.addEventListener('click', function() {
                     window.history.pushState({}, '', '/twitter');
+                    handleRoute();
+                });
+            }
+            // Ajout du gestionnaire pour le logo
+            const logo = document.getElementById('logo-link');
+            if (logo) {
+                logo.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.history.pushState({}, '', '/');
                     handleRoute();
                 });
             }
