@@ -1070,6 +1070,8 @@
         function displayYTVideoResults(videos) {
             const resultsGrid = document.getElementById("ytvideo-results-grid");
             resultsGrid.innerHTML = "";
+            // Toujours masquer le compteur avant d'afficher les résultats
+            document.getElementById("ytvideo-counter-container").style.display = "none";
             videos.forEach(video => {
                 // video = [titre, miniature, id]
                 const card = document.createElement('div');
@@ -1094,60 +1096,16 @@
 
         // Affiche le compteur vidéo
         function showYTVideoCounter() {
+            // Affiche le compteur
             document.getElementById("ytvideo-counter-container").style.display = "block";
+            // Masque les résultats vidéo
             document.getElementById("ytvideo-results-container").style.display = "none";
+            // Masque la carte de recherche vidéo
             document.querySelector("#main-container .search-card:nth-of-type(2)").style.display = "none";
+            // S'assure que le compteur est bien visible
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Récupère stats vidéo
-        async function fetchYTVideoStats() {
-            const id = ytvideoId;
-            if (!id) return;
-            try {
-                const response = await fetch(`https://mixerno.space/api/youtube-video-counter/user/${id}`);
-                const data = await response.json();
-                // Trouver les valeurs
-                const views = (data.counts.find(c => c.value === "views") || {}).count || 0;
-                const likes = (data.counts.find(c => c.value === "likes") || {}).count || 0;
-                const comments = (data.counts.find(c => c.value === "comments") || {}).count || 0;
-                const name = (data.user.find(u => u.value === "name") || {}).count || "";
-                const pfp = (data.user.find(u => u.value === "pfp") || {}).count || "";
-                document.getElementById("ytvideo-avatar").src = pfp;
-                document.getElementById("ytvideo-title").textContent = name;
-                // Odometer
-                if (!ytvideoOdoViews) {
-                    ytvideoOdoViews = new Odometer({
-                        el: document.getElementById("ytvideo-views"),
-                        value: views,
-                        format: '(,ddd)',
-                        theme: 'minimal'
-                    });
-                } else {
-                    ytvideoOdoViews.update(views);
-                }
-                if (!ytvideoOdoLikes) {
-                    ytvideoOdoLikes = new Odometer({
-                        el: document.getElementById("ytvideo-likes"),
-                        value: likes,
-                        format: '(,ddd)',
-                        theme: 'minimal'
-                    });
-                } else {
-                    ytvideoOdoLikes.update(likes);
-                }
-                if (!ytvideoOdoComments) {
-                    ytvideoOdoComments = new Odometer({
-                        el: document.getElementById("ytvideo-comments"),
-                        value: comments,
-                        format: '(,ddd)',
-                        theme: 'minimal'
-                    });
-                } else {
-                    ytvideoOdoComments.update(comments);
-                }
-            } catch (e) {}
-        }
         /* --- CODE EXISTANT --- */
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
