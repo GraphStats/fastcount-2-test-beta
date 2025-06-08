@@ -1183,6 +1183,34 @@
             }
         };
 
+        // Affichage résultats Twitter (corrigé pour la structure API)
+        function displayTwitterResults(accounts) {
+            const resultsGrid = document.getElementById("twitter-results-grid");
+            resultsGrid.innerHTML = "";
+            accounts.forEach(account => {
+                // account = [nom, avatar, username]
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.innerHTML = `
+                    <img src="${account[1] || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'}" alt="${account[0]}" class="channel-avatar">
+                    <div class="channel-info">
+                        <div class="channel-name">${account[0]}</div>
+                        <div class="channel-id">@${account[2]}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    twitterId = account[2];
+                    const newUrl = `/twitter/${twitterId}`;
+                    window.history.pushState({}, '', newUrl);
+                    showTwitterCounter();
+                    clearInterval(twitterIntervalId);
+                    fetchTwitterStats();
+                    twitterIntervalId = setInterval(fetchTwitterStats, 2000);
+                });
+                resultsGrid.appendChild(card);
+            });
+        }
+
         // Minimal mode Twitter
         window.checkTwitterMinimalMode = function() {
             const params = new URLSearchParams(window.location.search);
