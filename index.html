@@ -1270,6 +1270,12 @@
                 })
                 .catch(() => {});
         }
+
+        // Fonction globale pour afficher/masquer les options de partage Twitter
+        function toggleTwitterShareOptions() {
+            const options = document.getElementById("twitter-share-options");
+            options.style.display = options.style.display === "block" ? "none" : "block";
+        }
     </script>
 </body>
 </html>
