@@ -950,18 +950,17 @@
 
         // Gère la navigation selon l'URL
         function handleRoute() {
-            // Si on est sur /youtube ou sur /youtube#id
+            // Supporte aussi le cas où le chemin finit par /youtube/ (slash final)
+            const path = window.location.pathname.replace(/\/+$/, '');
             if (
-                window.location.pathname.endsWith('/youtube') ||
-                (window.location.pathname.endsWith('/youtube') && window.location.hash)
+                path.endsWith('/youtube')
             ) {
                 showYoutube();
-                // Toujours initialiser l'app si on est sur /youtube (avec ou sans hash)
                 init();
             } else {
                 // Si on est sur la racine mais qu'il y a un hash (ex: /#id), redirige vers /youtube#id
                 if (
-                    window.location.pathname === '/' &&
+                    (path === '' || path === '/') &&
                     window.location.hash &&
                     window.location.hash.length > 1
                 ) {
