@@ -959,6 +959,14 @@
             window.history.pushState({}, '', currentUrl);
         }
         
+        // Fonction globale pour le mode minimal Twitter
+        function activateTwitterMinimalMode() {
+            document.body.classList.add('minimal-mode');
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('minimal', 'true');
+            window.history.pushState({}, '', currentUrl);
+        }
+
         // Check for minimal mode on load
         function checkMinimalMode() {
             const params = new URLSearchParams(window.location.search);
