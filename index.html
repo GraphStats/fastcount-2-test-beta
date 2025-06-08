@@ -1314,35 +1314,33 @@
 
         function handleRoute() {
             let path = window.location.pathname;
-            // Ajout : /youtube/subs route
-            if (path.replace(/\/+$/, '') === '/youtube' || path.replace(/\/+$/, '') === '/youtube/subs') {
+            if (path.replace(/\/+$/, '') === '/youtube') {
                 showYoutube();
-                // Affiche la recherche de chaînes
-                document.querySelectorAll("#main-container .search-card")[0].style.display = "block";
-                document.querySelectorAll("#main-container .search-card")[1].style.display = "block";
-                document.getElementById("results-container").style.display = "none";
-                document.getElementById("counter-container").style.display = "none";
-                document.getElementById("ytvideo-results-container").style.display = "none";
-                document.getElementById("ytvideo-counter-container").style.display = "none";
-                initParticles();
-                // ...ne pas lancer init() pour éviter double initialisation...
+                init();
+            }
+            else if (/\/youtube\/[^\/]+$/.test(path)) {
+                showYoutube();
+                const channelIdFromUrl = getChannelIdFromPath();
+                if (channelIdFromUrl) {
+                    channelId = channelIdFromUrl;
+                    showCounter();
+                    fetchStatsData();
+                    clearInterval(intervalId);
+                    intervalId = setInterval(fetchStatsData, 2000);
+                }
                 checkMinimalMode();
             }
-            // Ajout : /youtube/video route
-            else if (path.replace(/\/+$/, '') === '/youtube/video') {
-                showYoutube();
-                // Affiche uniquement la recherche vidéo
-                document.querySelectorAll("#main-container .search-card")[0].style.display = "none";
-                document.querySelectorAll("#main-container .search-card")[1].style.display = "block";
-                document.getElementById("results-container").style.display = "none";
-                document.getElementById("counter-container").style.display = "none";
-                document.getElementById("ytvideo-results-container").style.display = "none";
-                document.getElementById("ytvideo-counter-container").style.display = "none";
-                initParticles();
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.startsWith('#/youtube/')
+            ) {
+                window.location.replace(window.location.hash.slice(1));
             }
-            // ...existing code...
-            else if (path === '' || path === '/') {
-                window.location.replace('/youtube');
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.length > 1
+            ) {
+                window.location.replace('/youtube/' + window.location.hash.substring(1));
             }
             else if (path.replace(/\/+$/, '') === '/twitter') {
                 showTwitter();
@@ -1724,8 +1722,8 @@
                     const newUrl = `/instagram/${instagramId}`;
                     window.history.pushState({}, '', newUrl);
                     showInstagramCounter();
-                    fetchInstagramStats();
                     clearInterval(instagramIntervalId);
+                    fetchInstagramStats();
                     instagramIntervalId = setInterval(fetchInstagramStats, 2000);
                 });
                 resultsGrid.appendChild(card);
