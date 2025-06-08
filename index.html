@@ -688,9 +688,7 @@
                     <i class="fab fa-instagram" style="color:#e1306c; margin-right: 0.5rem;"></i>
                     Instagram
                 </div>
-                <span class="home-link" style="cursor: not-allowed; opacity: 0.7; color: #aaa !important;">
-                    Soon!
-                </span>
+                <span class="home-link" id="goto-instagram">Instagram Live Follower Counter</span>
             </div>
             <!-- Bloc TikTok -->
             <div class="home-card">
@@ -835,6 +833,67 @@
             </div>
         </div>
     </div>
+    <!-- Instagram container -->
+    <div class="container hidden" id="instagram-container">
+        <!-- Search card -->
+        <div class="search-card">
+            <h1 class="search-title" style="color:#e1306c;">Instagram Follower Tracker</h1>
+            <p class="search-description">
+                Track real-time follower counts for any Instagram account with beautiful analytics.
+            </p>
+            <div class="search-form">
+                <input type="text" 
+                       class="search-input" 
+                       id="instagram-input" 
+                       placeholder="Enter Instagram username"
+                       onkeypress="handleInstagramKeyPress(event)">
+                <button class="search-button" style="background: linear-gradient(135deg,#e1306c,#fdc468);" onclick="fetchInstagramData()">
+                    <i class="fab fa-instagram"></i>
+                    Search
+                </button>
+            </div>
+            <div class="loader" id="instagram-loader">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+        </div>
+        <!-- Results container -->
+        <div class="results-container" id="instagram-results-container">
+            <h2 class="results-title">Search Results</h2>
+            <div class="results-grid" id="instagram-results-grid"></div>
+        </div>
+        <!-- Counter container -->
+        <div class="counter-container" id="instagram-counter-container">
+            <div class="channel-header">
+                <img src="" alt="Instagram Avatar" class="channel-avatar-lg" id="instagram-avatar">
+                <h2 class="channel-name-lg" id="instagram-name"></h2>
+                <p class="subscriber-label">Followers</p>
+                <div class="odometer" id="instagram-follower-count">0</div>
+            </div>
+            <div class="counter-actions">
+                <div class="share-dropdown">
+                    <button class="action-button share-button" style="background: linear-gradient(135deg,#e1306c,#fdc468);" onclick="toggleInstagramShareOptions()">
+                        <i class="fas fa-share-alt"></i>
+                        Share
+                    </button>
+                    <div class="share-options" id="instagram-share-options">
+                        <div class="share-option" onclick="shareInstagramOnTwitter()">
+                            <i class="fab fa-twitter"></i>
+                            Twitter
+                        </div>
+                        <div class="share-option" onclick="copyInstagramLink()">
+                            <i class="fas fa-link"></i>
+                            Copy Link
+                        </div>
+                    </div>
+                </div>
+                <button class="action-button minimal-button" onclick="activateInstagramMinimalMode()">
+                    <i class="fas fa-minimize"></i>
+                    Minimal Mode
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- Footer -->
     <footer class="footer hidden" id="main-footer">
         FastCount v3.1 • Real-time Analytics • © 2025
@@ -845,6 +904,7 @@
         // Global variables
         let channelId, intervalId, odometer;
         let twitterId, twitterIntervalId, twitterOdometer;
+        let instagramId, instagramIntervalId, instagramOdometer;
 
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -1011,6 +1071,13 @@
             window.history.pushState({}, '', currentUrl);
         }
 
+        function activateInstagramMinimalMode() {
+            document.body.classList.add('minimal-mode');
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('minimal', 'true');
+            window.history.pushState({}, '', currentUrl);
+        }
+
         function checkMinimalMode() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('minimal') === 'true') {
@@ -1024,6 +1091,14 @@
             if (params.get('minimal') === 'true') {
                 document.body.classList.add('minimal-mode');
                 document.getElementById("twitter-counter-container").style.display = "block";
+            }
+        }
+
+        function checkInstagramMinimalMode() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('minimal') === 'true') {
+                document.body.classList.add('minimal-mode');
+                document.getElementById("instagram-counter-container").style.display = "block";
             }
         }
 
@@ -1062,6 +1137,12 @@
                 !event.target.closest('.share-options')) {
                 twitterShareOptions.style.display = 'none';
             }
+            const instagramShareOptions = document.getElementById('instagram-share-options');
+            if (instagramShareOptions && instagramShareOptions.style.display === 'block' &&
+                !event.target.closest('.share-dropdown') &&
+                !event.target.closest('.share-options')) {
+                instagramShareOptions.style.display = 'none';
+            }
         });
 
         function getChannelIdFromPath() {
@@ -1073,6 +1154,12 @@
         function getTwitterIdFromPath() {
             const path = window.location.pathname.replace(/\/+$/, '');
             const match = path.match(/\/twitter\/([^\/]+)/);
+            return match ? match[1] : null;
+        }
+
+        function getInstagramIdFromPath() {
+            const path = window.location.pathname.replace(/\/+$/, '');
+            const match = path.match(/\/instagram\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
@@ -1145,9 +1232,49 @@
             ) {
                 window.location.replace('/twitter/' + window.location.hash.substring(1));
             }
+            else if (path.replace(/\/+$/, '') === '/instagram') {
+                showInstagram();
+                document.getElementById("instagram-container").classList.remove('hidden');
+                document.getElementById("main-container").classList.add('hidden');
+                document.getElementById("main-header").classList.remove('hidden');
+                document.getElementById("main-footer").classList.remove('hidden');
+                document.getElementById("instagram-counter-container").style.display = "none";
+                document.getElementById("instagram-results-container").style.display = "none";
+                document.querySelector("#instagram-container .search-card").style.display = "block";
+                checkInstagramMinimalMode();
+            }
+            else if (/\/instagram\/[^\/]+$/.test(path)) {
+                showInstagram();
+                document.getElementById("instagram-container").classList.remove('hidden');
+                document.getElementById("main-container").classList.add('hidden');
+                document.getElementById("main-header").classList.remove('hidden');
+                document.getElementById("main-footer").classList.remove('hidden');
+                const instagramIdFromUrl = getInstagramIdFromPath();
+                if (instagramIdFromUrl) {
+                    instagramId = instagramIdFromUrl;
+                    showInstagramCounter();
+                    fetchInstagramStats();
+                    clearInterval(instagramIntervalId);
+                    instagramIntervalId = setInterval(fetchInstagramStats, 2000);
+                }
+                checkInstagramMinimalMode();
+            }
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.startsWith('#/instagram/')
+            ) {
+                window.location.replace(window.location.hash.slice(1));
+            }
+            else if (
+                (path === '' || path === '/') &&
+                window.location.hash.length > 1
+            ) {
+                window.location.replace('/instagram/' + window.location.hash.substring(1));
+            }
             else {
                 showHome();
                 document.getElementById("twitter-container").classList.add('hidden');
+                document.getElementById("instagram-container").classList.add('hidden');
             }
         }
 
@@ -1169,6 +1296,12 @@
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('main-footer').classList.remove('hidden');
         }
+        function showInstagram() {
+            document.getElementById('home-block').classList.add('hidden');
+            document.getElementById('instagram-container').classList.remove('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('main-footer').classList.remove('hidden');
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             const goto = document.getElementById('goto-youtube');
@@ -1182,6 +1315,13 @@
             if (gotoTwitter) {
                 gotoTwitter.addEventListener('click', function() {
                     window.history.pushState({}, '', '/twitter');
+                    handleRoute();
+                });
+            }
+            const gotoInstagram = document.getElementById('goto-instagram');
+            if (gotoInstagram) {
+                gotoInstagram.addEventListener('click', function() {
+                    window.history.pushState({}, '', '/instagram');
                     handleRoute();
                 });
             }
@@ -1310,6 +1450,122 @@
                 .then(() => {
                     showAlert("Link copied to clipboard!");
                     document.getElementById("twitter-share-options").style.display = "none";
+                })
+                .catch(() => showAlert("Failed to copy link. Please try again."));
+        }
+
+        window.handleInstagramKeyPress = function(event) {
+            if (event.key === "Enter") {
+                window.fetchInstagramData();
+            }
+        };
+
+        window.fetchInstagramData = async function() {
+            const username = document.getElementById("instagram-input").value.trim();
+            if (!username) {
+                showAlert("Please enter an Instagram username");
+                return;
+            }
+            const loader = document.getElementById("instagram-loader");
+            const resultsContainer = document.getElementById("instagram-results-container");
+            const resultsGrid = document.getElementById("instagram-results-grid");
+            loader.style.display = "block";
+            resultsContainer.style.display = "none";
+            resultsGrid.innerHTML = "";
+            try {
+                const response = await fetch(`https://mixerno.space/api/instagram-user-counter/search/${encodeURIComponent(username)}`);
+                const data = await response.json();
+                loader.style.display = "none";
+                if (!data.list || data.list.length === 0) {
+                    showAlert("No accounts found. Please try another name.");
+                    return;
+                }
+                displayInstagramResults(data.list);
+                resultsContainer.style.display = "block";
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                loader.style.display = "none";
+                showAlert("An error occurred during Instagram search.");
+            }
+        };
+
+        function displayInstagramResults(accounts) {
+            const resultsGrid = document.getElementById("instagram-results-grid");
+            resultsGrid.innerHTML = "";
+            accounts.forEach(account => {
+                // account = [name, avatar, username]
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.innerHTML = `
+                    <img src="${account[1] || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png'}" alt="${account[0]}" class="channel-avatar">
+                    <div class="channel-info">
+                        <div class="channel-name">${account[0]}</div>
+                        <div class="channel-id">@${account[2]}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    instagramId = account[2];
+                    const newUrl = `/instagram/${instagramId}`;
+                    window.history.pushState({}, '', newUrl);
+                    showInstagramCounter();
+                    clearInterval(instagramIntervalId);
+                    fetchInstagramStats();
+                    instagramIntervalId = setInterval(fetchInstagramStats, 2000);
+                });
+                resultsGrid.appendChild(card);
+            });
+        }
+
+        function showInstagramCounter() {
+            document.getElementById("instagram-counter-container").style.display = "block";
+            document.getElementById("instagram-results-container").style.display = "none";
+            document.querySelector("#instagram-container .search-card").style.display = "none";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function fetchInstagramStats() {
+            const id = getInstagramIdFromPath() || instagramId;
+            fetch(`https://mixerno.space/api/instagram-user-counter/user/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    const pfp = (data.user.find(u => u.value === "pfp") || {}).count || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png';
+                    document.getElementById("instagram-avatar").src = pfp;
+                    const name = (data.user.find(u => u.value === "name") || {}).count || "";
+                    document.getElementById("instagram-name").textContent = name;
+                    const followers = (data.counts.find(c => c.value === "followers") || {}).count || 0;
+                    if (!instagramOdometer) {
+                        instagramOdometer = new Odometer({
+                            el: document.getElementById("instagram-follower-count"),
+                            value: followers,
+                            format: '(,ddd)',
+                            theme: 'minimal'
+                        });
+                    } else {
+                        instagramOdometer.update(followers);
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function toggleInstagramShareOptions() {
+            const options = document.getElementById("instagram-share-options");
+            options.style.display = options.style.display === "block" ? "none" : "block";
+        }
+
+        function shareInstagramOnTwitter() {
+            const name = document.getElementById("instagram-name").textContent || "Instagram";
+            const count = document.getElementById("instagram-follower-count").textContent || "0";
+            const text = `Check out ${name}'s follower count: ${count} on @FastCount!`;
+            const url = window.location.href;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            document.getElementById("instagram-share-options").style.display = "none";
+        }
+
+        function copyInstagramLink() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => {
+                    showAlert("Link copied to clipboard!");
+                    document.getElementById("instagram-share-options").style.display = "none";
                 })
                 .catch(() => showAlert("Failed to copy link. Please try again."));
         }
