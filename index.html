@@ -1234,6 +1234,34 @@
             document.querySelector("#twitter-container .search-card").style.display = "none";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        // Fonction pour récupérer les stats Twitter (doit être globale)
+        function fetchTwitterStats() {
+            const id = getTwitterIdFromPath() || twitterId;
+            fetch(`https://mixerno.space/api/twitter-user-counter/user/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Avatar
+                    const pfp = (data.user.find(u => u.value === "pfp") || {}).count || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png';
+                    document.getElementById("twitter-avatar").src = pfp;
+                    // Nom
+                    const name = (data.user.find(u => u.value === "name") || {}).count || "";
+                    document.getElementById("twitter-name").textContent = name;
+                    // Followers
+                    const followers = (data.counts.find(c => c.value === "followers") || {}).count || 0;
+                    if (!twitterOdometer) {
+                        twitterOdometer = new Odometer({
+                            el: document.getElementById("twitter-follower-count"),
+                            value: followers,
+                            format: '(,ddd)',
+                            theme: 'minimal'
+                        });
+                    } else {
+                        twitterOdometer.update(followers);
+                    }
+                })
+                .catch(() => {});
+        }
     </script>
 </body>
 </html>
