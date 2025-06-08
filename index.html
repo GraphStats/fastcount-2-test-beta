@@ -477,6 +477,32 @@
             animation: pulse 2s infinite;
         }
         
+        /* Ajout : couleur Twitter pour le compteur en mode minimal */
+        .minimal-mode .twitter-counter .odometer,
+        .minimal-mode #twitter-counter-container .odometer {
+            background: linear-gradient(90deg,#1da1f2,#6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Ajout : couleur Twitter pour le bouton share en mode minimal */
+        .minimal-mode #twitter-counter-container .share-button {
+            background: linear-gradient(135deg,#1da1f2,#6366f1);
+            color: white;
+            border: none;
+        }
+        
+        /* Ajout : couleur Twitter pour le bouton minimal en mode minimal */
+        .minimal-mode #twitter-counter-container .minimal-button {
+            color: #1da1f2;
+            border: 1px solid #1da1f2;
+        }
+        
+        .minimal-mode #twitter-counter-container .minimal-button:hover {
+            background: rgba(29,161,242,0.1);
+        }
+        
         /* Footer */
         .footer {
             text-align: center;
