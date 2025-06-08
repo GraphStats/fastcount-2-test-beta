@@ -611,9 +611,8 @@
         <div class="search-card">
             <h1 class="search-title">YouTube Subscriber Tracker</h1>
             <p class="search-description">
-                Track real-time subscriber counts for any YouTube channel with beautiful analytics
+                Track real-time subscriber counts for any YouTube channel with beautiful analytics.
             </p>
-            
             <div class="search-form">
                 <input type="text" 
                        class="search-input" 
@@ -625,19 +624,16 @@
                     Search
                 </button>
             </div>
-            
             <div class="loader" id="loader">
                 <div class="loader-circle"></div>
                 <div class="loader-circle"></div>
             </div>
         </div>
-        
         <!-- Results container -->
         <div class="results-container" id="results-container">
             <h2 class="results-title">Search Results</h2>
             <div class="results-grid" id="results-grid"></div>
         </div>
-        
         <!-- Counter container -->
         <div class="counter-container" id="counter-container">
             <div class="channel-header">
@@ -646,7 +642,6 @@
                 <p class="subscriber-label">Subscribers</p>
                 <div class="odometer" id="subscriber-count">0</div>
             </div>
-            
             <div class="counter-actions">
                 <div class="share-dropdown">
                     <button class="action-button share-button" onclick="toggleShareOptions()">
@@ -664,7 +659,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <button class="action-button minimal-button" onclick="activateMinimalMode()">
                     <i class="fas fa-minimize"></i>
                     Minimal Mode
@@ -672,24 +666,23 @@
             </div>
         </div>
     </div>
-    
     <!-- Twitter container -->
     <div class="container hidden" id="twitter-container">
         <!-- Search card -->
         <div class="search-card">
             <h1 class="search-title" style="background: linear-gradient(90deg,#1da1f2,#6366f1);">Twitter Follower Tracker</h1>
             <p class="search-description">
-                Suivez en temps réel le nombre d'abonnés de n'importe quel compte Twitter/X avec de belles statistiques.
+                Track real-time follower counts for any Twitter/X account with beautiful analytics.
             </p>
             <div class="search-form">
                 <input type="text" 
                        class="search-input" 
                        id="twitter-input" 
-                       placeholder="Entrez le nom du compte Twitter"
+                       placeholder="Enter Twitter username"
                        onkeypress="handleTwitterKeyPress(event)">
                 <button class="search-button" style="background: linear-gradient(135deg,#1da1f2,#6366f1);" onclick="fetchTwitterData()">
                     <i class="fab fa-x-twitter"></i>
-                    Rechercher
+                    Search
                 </button>
             </div>
             <div class="loader" id="twitter-loader">
@@ -699,13 +692,13 @@
         </div>
         <!-- Results container -->
         <div class="results-container" id="twitter-results-container">
-            <h2 class="results-title">Résultats de la recherche</h2>
+            <h2 class="results-title">Search Results</h2>
             <div class="results-grid" id="twitter-results-grid"></div>
         </div>
         <!-- Counter container -->
         <div class="counter-container" id="twitter-counter-container">
             <div class="channel-header">
-                <img src="" alt="Avatar Twitter" class="channel-avatar-lg" id="twitter-avatar">
+                <img src="" alt="Twitter Avatar" class="channel-avatar-lg" id="twitter-avatar">
                 <h2 class="channel-name-lg" id="twitter-name"></h2>
                 <p class="subscriber-label">Followers</p>
                 <div class="odometer" id="twitter-follower-count">0</div>
@@ -714,7 +707,7 @@
                 <div class="share-dropdown">
                     <button class="action-button share-button" style="background: linear-gradient(135deg,#1da1f2,#6366f1);" onclick="toggleTwitterShareOptions()">
                         <i class="fas fa-share-alt"></i>
-                        Partager
+                        Share
                     </button>
                     <div class="share-options" id="twitter-share-options">
                         <div class="share-option" onclick="shareTwitterOnTwitter()">
@@ -723,7 +716,7 @@
                         </div>
                         <div class="share-option" onclick="copyTwitterLink()">
                             <i class="fas fa-link"></i>
-                            Copier le lien
+                            Copy Link
                         </div>
                     </div>
                 </div>
@@ -734,54 +727,38 @@
             </div>
         </div>
     </div>
-    
     <!-- Footer -->
     <footer class="footer hidden" id="main-footer">
-        FastCount v2.0 • Real-time YouTube Analytics • © 2025
+        FastCount v2.0 • Real-time Analytics • © 2025
     </footer>
-    
     <!-- Odometer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
-    
     <script>
         // Global variables
         let channelId, intervalId, odometer;
-        // Variables Twitter
         let twitterId, twitterIntervalId, twitterOdometer;
 
-        // Initialize particles
         function initParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = window.innerWidth < 768 ? 20 : 50;
-            
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
-                
-                // Random size between 2px and 8px
                 const size = Math.random() * 6 + 2;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
-                
-                // Random position
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
-                
-                // Random animation duration and delay
                 const duration = Math.random() * 20 + 10;
                 const delay = Math.random() * 5;
                 particle.style.animationDuration = `${duration}s`;
                 particle.style.animationDelay = `${delay}s`;
-                
                 particlesContainer.appendChild(particle);
             }
         }
-        
-        // Initialize page
+
         function init() {
             initParticles();
-            
-            // Check for URL hash (channel id) or minimal mode
             const urlFragment = window.location.hash.slice(1);
             if (urlFragment) {
                 channelId = urlFragment;
@@ -791,59 +768,45 @@
             }
             checkMinimalMode();
         }
-        
-        // Handle key press in search input
+
         function handleKeyPress(event) {
             if (event.key === "Enter") {
                 fetchChannelData();
             }
         }
-        
-        // Fetch channel data from API
+
         async function fetchChannelData() {
             const channelName = document.getElementById("channel-input").value.trim();
             if (!channelName) {
                 showAlert("Please enter a channel name");
                 return;
             }
-            
             const loader = document.getElementById("loader");
             const resultsContainer = document.getElementById("results-container");
             const resultsGrid = document.getElementById("results-grid");
-            
-            // Show loader and hide results
             loader.style.display = "block";
             resultsContainer.style.display = "none";
             resultsGrid.innerHTML = "";
-            
             try {
                 const response = await fetch(`https://mixerno.space/api/youtube-channel-counter/search/${encodeURIComponent(channelName)}`);
                 const data = await response.json();
-                
                 loader.style.display = "none";
-                
                 if (!data.list || data.list.length === 0) {
                     showAlert("No channels found. Please try a different name.");
                     return;
                 }
-                
                 displayChannelResults(data.list);
                 resultsContainer.style.display = "block";
-                
-                // Smooth scroll to results
                 resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                console.error("Error fetching channel data:", error);
                 loader.style.display = "none";
                 showAlert("An error occurred. Please try again later.");
             }
         }
-        
-        // Display channel results
+
         function displayChannelResults(channels) {
             const resultsGrid = document.getElementById("results-grid");
             resultsGrid.innerHTML = "";
-            
             channels.forEach(channel => {
                 const channelCard = document.createElement('div');
                 channelCard.className = 'channel-card';
@@ -854,40 +817,29 @@
                         <div class="channel-id">${channel[2]}</div>
                     </div>
                 `;
-                
                 channelCard.addEventListener('click', () => {
                     channelId = channel[2];
-                    // Change l'URL en /youtube/:id
                     const newUrl = `/youtube/${channelId}`;
                     window.history.pushState({}, '', newUrl);
-
                     showCounter();
                     clearInterval(intervalId);
-
                     fetchStatsData();
                     intervalId = setInterval(fetchStatsData, 2000);
                 });
-                
                 resultsGrid.appendChild(channelCard);
             });
         }
-        
+
         async function fetchStatsData() {
-            // Utilise toujours l'id extrait de l'URL si possible
             const id = getChannelIdFromPath() || channelId;
             try {
                 const response = await fetch(`https://backend.mixerno.space/api/youtube/estv3/${id}`);
-                
                 if (response.ok) {
                     const data = await response.json();
-                    
                     if (data && data.items && data.items.length > 0) {
                         const channel = data.items[0];
-                        
                         document.getElementById("channel-avatar").src = channel.snippet.thumbnails?.high?.url || channel.snippet.thumbnails?.default?.url || 'https://via.placeholder.com/120';
                         document.getElementById("channel-name").textContent = channel.snippet.title;
-                        
-                        // Update subscriber count
                         if (channel.statistics && typeof channel.statistics.subscriberCount === "number") {
                             if (!odometer) {
                                 odometer = new Odometer({
@@ -901,34 +853,22 @@
                             }
                         }
                     }
-                } else {
-                    console.error("Failed to fetch stats data:", response.statusText);
                 }
-            } catch (error) {
-                console.error("Error fetching stats data:", error);
-            }
+            } catch (error) {}
         }
-        
-        // Show counter view
+
         function showCounter() {
             document.getElementById("counter-container").style.display = "block";
             document.getElementById("results-container").style.display = "none";
             document.querySelector(".search-card").style.display = "none";
-            
-            // Scroll to top smoothly
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        // Toggle share options
+
         function toggleShareOptions() {
             const options = document.getElementById("share-options");
             options.style.display = options.style.display === "block" ? "none" : "block";
         }
-        
-        // Share on Twitter
+
         function shareOnTwitter() {
             const channelName = document.getElementById("channel-name").textContent || "YouTube channel";
             const count = document.getElementById("subscriber-count").textContent || "0";
@@ -937,29 +877,25 @@
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
             document.getElementById("share-options").style.display = "none";
         }
-        
-        // Copy link to clipboard
+
         function copyLink() {
             navigator.clipboard.writeText(window.location.href)
                 .then(() => {
                     showAlert("Link copied to clipboard!");
                     document.getElementById("share-options").style.display = "none";
                 })
-                .catch(err => {
-                    console.error('Failed to copy link:', err);
+                .catch(() => {
                     showAlert("Failed to copy link. Please try again.");
                 });
         }
-        
-        // Activate minimal mode
+
         function activateMinimalMode() {
             document.body.classList.add('minimal-mode');
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.set('minimal', 'true');
             window.history.pushState({}, '', currentUrl);
         }
-        
-        // Fonction globale pour le mode minimal Twitter
+
         function activateTwitterMinimalMode() {
             document.body.classList.add('minimal-mode');
             const currentUrl = new URL(window.location.href);
@@ -967,7 +903,6 @@
             window.history.pushState({}, '', currentUrl);
         }
 
-        // Check for minimal mode on load
         function checkMinimalMode() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('minimal') === 'true') {
@@ -975,8 +910,7 @@
                 document.getElementById("counter-container").style.display = "block";
             }
         }
-        
-        // Minimal mode Twitter (doit être défini avant handleRoute)
+
         function checkTwitterMinimalMode() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('minimal') === 'true') {
@@ -984,13 +918,11 @@
                 document.getElementById("twitter-counter-container").style.display = "block";
             }
         }
-        
-        // Show alert message
+
         function showAlert(message) {
             const alert = document.createElement('div');
             alert.className = 'alert';
             alert.textContent = message;
-            
             alert.style.position = 'fixed';
             alert.style.top = '20px';
             alert.style.left = '50%';
@@ -1002,54 +934,48 @@
             alert.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
             alert.style.zIndex = '1000';
             alert.style.animation = 'fadeIn 0.3s ease-out';
-            
             document.body.appendChild(alert);
-            
             setTimeout(() => {
                 alert.style.animation = 'fadeOut 0.3s ease-out';
                 setTimeout(() => document.body.removeChild(alert), 300);
             }, 3000);
         }
-        
-        // Close share options when clicking outside
+
         document.addEventListener('click', function(event) {
             const shareOptions = document.getElementById('share-options');
-            const shareButton = document.querySelector('.share-button');
-            
-            if (shareOptions.style.display === 'block' && 
+            if (shareOptions && shareOptions.style.display === 'block' && 
                 !event.target.closest('.share-dropdown') && 
                 !event.target.closest('.share-options')) {
                 shareOptions.style.display = 'none';
             }
+            const twitterShareOptions = document.getElementById('twitter-share-options');
+            if (twitterShareOptions && twitterShareOptions.style.display === 'block' &&
+                !event.target.closest('.share-dropdown') &&
+                !event.target.closest('.share-options')) {
+                twitterShareOptions.style.display = 'none';
+            }
         });
-        
-        // Helper pour extraire l'ID de chaîne depuis l'URL (youtube/:id)
+
         function getChannelIdFromPath() {
             const path = window.location.pathname.replace(/\/+$/, '');
             const match = path.match(/\/youtube\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
-        // Helper pour extraire l'id Twitter depuis l'URL
         function getTwitterIdFromPath() {
             const path = window.location.pathname.replace(/\/+$/, '');
             const match = path.match(/\/twitter\/([^\/]+)/);
             return match ? match[1] : null;
         }
 
-        // Nouvelle version de handleRoute pour supporter /youtube/:id
         function handleRoute() {
             let path = window.location.pathname;
-
-            // Si on est sur /youtube ou /youtube/
             if (path.replace(/\/+$/, '') === '/youtube') {
                 showYoutube();
                 init();
             }
-            // Si on est sur /youtube/:id ou /index.html/youtube/:id ou /404/youtube/:id
             else if (/\/youtube\/[^\/]+$/.test(path)) {
                 showYoutube();
-                // On récupère l'id de la chaîne depuis l'URL
                 const channelIdFromUrl = getChannelIdFromPath();
                 if (channelIdFromUrl) {
                     channelId = channelIdFromUrl;
@@ -1060,24 +986,20 @@
                 }
                 checkMinimalMode();
             }
-            // Si on est sur la racine avec un hash de l'ancienne forme, migration auto
             else if (
                 (path === '' || path === '/') &&
                 window.location.hash.startsWith('#/youtube/')
             ) {
                 window.location.replace(window.location.hash.slice(1));
             }
-            // Si on est sur la racine avec un hash #id, migration auto
             else if (
                 (path === '' || path === '/') &&
                 window.location.hash.length > 1
             ) {
                 window.location.replace('/youtube/' + window.location.hash.substring(1));
             }
-            // Twitter
             else if (path.replace(/\/+$/, '') === '/twitter') {
                 showTwitter();
-                // Init Twitter
                 document.getElementById("twitter-container").classList.remove('hidden');
                 document.getElementById("main-container").classList.add('hidden');
                 document.getElementById("main-header").classList.remove('hidden');
@@ -1093,7 +1015,6 @@
                 document.getElementById("main-container").classList.add('hidden');
                 document.getElementById("main-header").classList.remove('hidden');
                 document.getElementById("main-footer").classList.remove('hidden');
-                // On récupère l'id du compte Twitter depuis l'URL
                 const twitterIdFromUrl = getTwitterIdFromPath();
                 if (twitterIdFromUrl) {
                     twitterId = twitterIdFromUrl;
@@ -1104,14 +1025,12 @@
                 }
                 checkTwitterMinimalMode();
             }
-            // Si on est sur la racine avec un hash de l'ancienne forme, migration auto
             else if (
                 (path === '' || path === '/') &&
                 window.location.hash.startsWith('#/twitter/')
             ) {
                 window.location.replace(window.location.hash.slice(1));
             }
-            // Si on est sur la racine avec un hash #id, migration auto
             else if (
                 (path === '' || path === '/') &&
                 window.location.hash.length > 1
@@ -1143,9 +1062,7 @@
             document.getElementById('main-footer').classList.remove('hidden');
         }
 
-        // Clique sur le lien d'accueil
         document.addEventListener('DOMContentLoaded', function() {
-            // Ajoute le listener sur le lien d'accueil
             const goto = document.getElementById('goto-youtube');
             if (goto) {
                 goto.addEventListener('click', function() {
@@ -1153,7 +1070,6 @@
                     handleRoute();
                 });
             }
-            // Ajoute le listener sur le lien Twitter
             const gotoTwitter = document.getElementById('goto-twitter');
             if (gotoTwitter) {
                 gotoTwitter.addEventListener('click', function() {
@@ -1161,27 +1077,20 @@
                     handleRoute();
                 });
             }
-            // Gère le bouton retour navigateur
             window.addEventListener('popstate', handleRoute);
-
-            // Appelle la logique de route au chargement
             handleRoute();
         });
 
-        // --- Fonctions Twitter manquantes à rendre globales ---
-
-        // Gestion touche entrée pour Twitter
         window.handleTwitterKeyPress = function(event) {
             if (event.key === "Enter") {
                 window.fetchTwitterData();
             }
         };
 
-        // Recherche Twitter
         window.fetchTwitterData = async function() {
             const username = document.getElementById("twitter-input").value.trim();
             if (!username) {
-                showAlert("Veuillez entrer un nom de compte Twitter");
+                showAlert("Please enter a Twitter username");
                 return;
             }
             const loader = document.getElementById("twitter-loader");
@@ -1195,7 +1104,7 @@
                 const data = await response.json();
                 loader.style.display = "none";
                 if (!data.list || data.list.length === 0) {
-                    showAlert("Aucun compte trouvé. Essayez un autre nom.");
+                    showAlert("No accounts found. Please try another name.");
                     return;
                 }
                 displayTwitterResults(data.list);
@@ -1203,16 +1112,15 @@
                 resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
                 loader.style.display = "none";
-                showAlert("Erreur lors de la recherche Twitter.");
+                showAlert("An error occurred during Twitter search.");
             }
         };
 
-        // Affichage résultats Twitter (corrigé pour la structure API)
         function displayTwitterResults(accounts) {
             const resultsGrid = document.getElementById("twitter-results-grid");
             resultsGrid.innerHTML = "";
             accounts.forEach(account => {
-                // account = [nom, avatar, username]
+                // account = [name, avatar, username]
                 const card = document.createElement('div');
                 card.className = 'channel-card';
                 card.innerHTML = `
@@ -1235,7 +1143,6 @@
             });
         }
 
-        // Ajout de la fonction globale showTwitterCounter
         window.showTwitterCounter = function() {
             document.getElementById("twitter-counter-container").style.display = "block";
             document.getElementById("twitter-results-container").style.display = "none";
@@ -1243,19 +1150,15 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Fonction pour récupérer les stats Twitter (doit être globale)
         function fetchTwitterStats() {
             const id = getTwitterIdFromPath() || twitterId;
             fetch(`https://mixerno.space/api/twitter-user-counter/user/${id}`)
                 .then(res => res.json())
                 .then(data => {
-                    // Avatar
                     const pfp = (data.user.find(u => u.value === "pfp") || {}).count || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png';
                     document.getElementById("twitter-avatar").src = pfp;
-                    // Nom
                     const name = (data.user.find(u => u.value === "name") || {}).count || "";
                     document.getElementById("twitter-name").textContent = name;
-                    // Followers
                     const followers = (data.counts.find(c => c.value === "followers") || {}).count || 0;
                     if (!twitterOdometer) {
                         twitterOdometer = new Odometer({
@@ -1271,10 +1174,27 @@
                 .catch(() => {});
         }
 
-        // Fonction globale pour afficher/masquer les options de partage Twitter
         function toggleTwitterShareOptions() {
             const options = document.getElementById("twitter-share-options");
             options.style.display = options.style.display === "block" ? "none" : "block";
+        }
+
+        function shareTwitterOnTwitter() {
+            const name = document.getElementById("twitter-name").textContent || "Twitter";
+            const count = document.getElementById("twitter-follower-count").textContent || "0";
+            const text = `Check out ${name}'s follower count: ${count} on @FastCount!`;
+            const url = window.location.href;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            document.getElementById("twitter-share-options").style.display = "none";
+        }
+
+        function copyTwitterLink() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => {
+                    showAlert("Link copied to clipboard!");
+                    document.getElementById("twitter-share-options").style.display = "none";
+                })
+                .catch(() => showAlert("Failed to copy link. Please try again."));
         }
     </script>
 </body>
