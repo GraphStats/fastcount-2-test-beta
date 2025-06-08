@@ -507,15 +507,15 @@
         
         /* Home block styles */
         .home-block {
-            position: fixed;
-            inset: 0;
-            z-index: 10;
+            position: static;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-start;
+            justify-content: flex-start;
             background: none;
         }
         .home-card {
+            margin: 3rem 0 0 3rem;
             background: var(--card-bg);
             border-radius: 1.5rem;
             box-shadow: var(--shadow);
