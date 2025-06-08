@@ -951,10 +951,22 @@
         // Gère la navigation selon l'URL
         function handleRoute() {
             // Supporte aussi le cas où le chemin finit par /youtube/ (slash final)
-            const path = window.location.pathname.replace(/\/+$/, '');
+            let path = window.location.pathname;
+            // Pour les hébergements statiques (Vercel, etc.), si le fichier n'est pas trouvé, il sert /404 ou /index.html
+            // On tente de détecter si on est sur une page 404 mais avec un hash valide
             if (
-                path.endsWith('/youtube')
+                (path.endsWith('/youtube') || path.endsWith('/youtube/')) ||
+                // Cas Vercel: /404 ou /index.html mais hash d'une chaîne
+                ((path.endsWith('/404') || path.endsWith('/index.html')) &&
+                    window.location.hash &&
+                    window.location.hash.length > 1)
             ) {
+                // Si on est sur /404 ou /index.html avec un hash, on remplace l'URL par /youtube#id
+                if ((path.endsWith('/404') || path.endsWith('/index.html')) &&
+                    window.location.hash &&
+                    window.location.hash.length > 1) {
+                    window.history.replaceState({}, '', '/youtube' + window.location.hash);
+                }
                 showYoutube();
                 init();
             } else {
