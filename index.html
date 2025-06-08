@@ -513,45 +513,85 @@
         
         /* Home block styles */
         .home-block {
-            position: static;
+            position: fixed;
+            inset: 0;
             min-height: 100vh;
+            width: 100vw;
             display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            background: none;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #232946 0%, #6366f1 100%);
+            z-index: 1;
+            overflow: auto;
+            animation: fadeIn 1.2s;
+        }
+        .home-block::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 60% 40%, rgba(99,102,241,0.18) 0%, rgba(16,185,129,0.10) 60%, transparent 100%);
+            pointer-events: none;
+        }
+        .home-block .home-cards-row {
+            display: flex;
+            gap: 3rem;
+            align-items: stretch;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         .home-card {
-            margin: 3rem 0 0 3rem;
-            background: var(--card-bg);
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--card-border);
-            padding: 3rem 2.5rem 2.5rem 2.5rem;
+            background: rgba(15, 23, 42, 0.82);
+            border-radius: 2.2rem;
+            box-shadow: 0 8px 32px 0 rgba(99,102,241,0.18), 0 1.5px 8px rgba(16,185,129,0.09);
+            border: 1.5px solid var(--card-border);
+            padding: 3.2rem 2.7rem 2.5rem 2.7rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            animation: fadeIn 0.8s;
-            max-width: 95vw;
-            transition: var(--transition);
-            transform: translateY(0);
+            min-width: 260px;
+            min-height: 260px;
+            max-width: 320px;
+            transition: var(--transition), box-shadow 0.25s;
+            transform: translateY(0) scale(1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.9s cubic-bezier(.16,1,.3,1);
+        }
+        .home-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 2.2rem;
+            pointer-events: none;
+            box-shadow: 0 0 0 0 rgba(99,102,241,0.15);
+            transition: box-shadow 0.25s;
         }
         .home-card:hover {
-            transform: translateY(-22px) scale(1.035) rotate(-1.5deg);
-            box-shadow: 0 36px 56px -10px rgba(99,102,241,0.23), 0 10px 36px -10px rgba(16,185,129,0.13), 0 2px 8px rgba(0,0,0,0.12);
+            transform: translateY(-18px) scale(1.045) rotate(-1.5deg);
+            box-shadow: 0 24px 56px -8px rgba(99,102,241,0.26), 0 8px 32px -8px rgba(16,185,129,0.13), 0 2px 8px rgba(0,0,0,0.13);
             border-color: var(--primary);
             z-index: 2;
         }
+        .home-card:hover::after {
+            box-shadow: 0 0 32px 8px rgba(99,102,241,0.18);
+        }
         .home-title {
-            font-size: 3.2rem;
+            font-size: 2.5rem;
             font-weight: 900;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             color: var(--primary);
             margin-bottom: 2.2rem;
-            text-shadow: 0 2px 12px rgba(99,102,241,0.15);
+            text-shadow: 0 2px 12px rgba(99,102,241,0.13);
             text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            user-select: none;
         }
         .home-link {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 700;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -559,9 +599,11 @@
             color: transparent;
             cursor: pointer;
             text-decoration: underline;
-            transition: color 0.2s;
+            transition: color 0.2s, text-shadow 0.2s;
             margin-bottom: 0.5rem;
             text-align: center;
+            text-shadow: 0 1px 8px rgba(99,102,241,0.09);
+            user-select: none;
         }
         .home-link:hover {
             color: var(--primary);
@@ -569,26 +611,45 @@
             -webkit-background-clip: unset;
             background-clip: unset;
             color: var(--primary);
+            text-shadow: 0 2px 16px rgba(99,102,241,0.18);
         }
-        /* Hide container by default for home */
-        .container.hidden,
-        .header.hidden,
-        .footer.hidden {
-            display: none !important;
+        .home-link[style*="not-allowed"] {
+            pointer-events: none;
+            filter: grayscale(0.2);
         }
-        /* Hide home block for /youtube */
-        .home-block.hidden {
-            display: none !important;
-        }
-        @media (max-width: 600px) {
+        @media (max-width: 900px) {
+            .home-block .home-cards-row {
+                gap: 1.5rem;
+            }
             .home-card {
-                padding: 2rem 1rem 1.5rem 1rem;
+                min-width: 220px;
+                max-width: 95vw;
+                padding: 2.2rem 1.2rem 1.2rem 1.2rem;
             }
             .home-title {
-                font-size: 2.1rem;
+                font-size: 1.5rem;
             }
             .home-link {
+                font-size: 1rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .home-block .home-cards-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 1.2rem;
+            }
+            .home-card {
+                min-width: 0;
+                width: 90vw;
+                max-width: 98vw;
+                padding: 1.5rem 0.7rem 1rem 0.7rem;
+            }
+            .home-title {
                 font-size: 1.1rem;
+            }
+            .home-link {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -599,7 +660,7 @@
     
     <!-- Home block -->
     <div class="home-block" id="home-block">
-        <div style="display: flex; gap: 2.5rem; align-items: flex-start;">
+        <div class="home-cards-row">
             <div class="home-card">
                 <div class="home-title">
                     <i class="fab fa-youtube" style="color:#ff0000; margin-right: 0.5rem;"></i>
