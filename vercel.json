@@ -1,9 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/youtube/:id", "destination": "/" },
-    { "source": "/twitter/:id", "destination": "/" },
-    { "source": "/youtube", "destination": "/" },
-    { "source": "/twitter", "destination": "/" },
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
